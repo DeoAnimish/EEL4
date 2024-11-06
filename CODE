@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+char first_name[20];
+char last_name[20];
+char license[20]="IB223";
+char u_license[20];
+int i;
+char copied[5];
+
+float calculate_hra_exemption(float rent_paid);
+float calculate_80c_deduction(float insurance_paid);
+float calculate_taxable_income(float income, float rent_income, float hra_exemption, float insurance_deduction, float home_loan_interest);
+float calculate_tax(float taxable_income);
+void display_summary(float income, float rent_paid, float insurance_paid, float home_loan_interest, float rent_income, float taxable_income, float tax);
+int verify();
+
+int main() {
+    float income, tax, rent_paid, hra_exemption, insurance_paid, home_loan_interest, rent_income, taxable_income;
+    
+    verify();
+
+    printf("Enter your annual income: ");
+    scanf("%f", &income);
+
+    printf("Enter the amount of rent paid annually: ");
+    scanf("%f", &rent_paid);
+    
+    printf("Enter the amount of insurance premium paid (Section 80C): ");
+    scanf("%f", &insurance_paid);
+
+    printf("Enter the amount of home loan interest paid: ");
+    scanf("%f", &home_loan_interest);
+
+    printf("Enter the amount of rent income earned annually: ");
+    scanf("%f", &rent_income);
+
+    hra_exemption = calculate_hra_exemption(rent_paid);
+
+    float insurance_deduction = calculate_80c_deduction(insurance_paid);
+
+    taxable_income = calculate_taxable_income(income, rent_income, hra_exemption, insurance_deduction, home_loan_interest);
+
+    tax = calculate_tax(taxable_income);
+
+    display_summary(income, rent_paid, insurance_paid, home_loan_interest, rent_income, taxable_income, tax);
+
+    return 0;
+}
+
+float calculate_hra_exemption(float rent_paid) {
+    return (rent_paid > 60000) ? 60000 : rent_paid;
+}
+
+float calculate_80c_deduction(float insurance_paid) {
+    const float max_80c_deduction = 150000.0;
+    return (insurance_paid > max_80c_deduction) ? max_80c_deduction : insurance_paid;
+}
+
+float calculate_taxable_income(float income, float rent_income, float hra_exemption, float insurance_deduction, float home_loan_interest) {
+    float taxable_income = income + rent_income - hra_exemption - insurance_deduction - home_loan_interest;
+    return (taxable_income < 0) ? 0 : taxable_income;  
+}
+
+float calculate_tax(float taxable_income) {
+    float tax = 0.0;
+
+    if (taxable_income <= 250000) {
+        tax = 0;  
+    } 
+    else if (taxable_income <= 500000) {
+        tax = (taxable_income - 250000) * 0.05;  
+    } 
+    else if (taxable_income <= 1000000) {
+        tax = (taxable_income - 500000) * 0.2 + 12500;  
+    } 
+    else {
+        tax = (taxable_income - 1000000) * 0.3 + 112500;  
+    }
+
+    return tax;
+}
+
+void display_summary(float income, float rent_paid, float insurance_paid, float home_loan_interest, float rent_income, float taxable_income, float tax) {
+    printf("\n");
+    printf("---------------------------------------------------\n");
+    printf("|                TAX CALCULATOR SUMMARY           |\n");
+    printf("|                                  LISENCE-%s  |\n",u_license);
+    printf("  USER--%-51s                                      \n",first_name);
+    printf("|                                                 |\n");
+    printf("---------------------------------------------------\n");
+    printf("| %-30s | %-10.2f |\n", "Annual Income", income);
+    printf("| %-30s | %-10.2f |\n", "Rent Paid", rent_paid);
+    printf("| %-30s | %-10.2f |\n", "Insurance Paid (80C)", insurance_paid);
+    printf("| %-30s | %-10.2f |\n", "Home Loan Interest Paid", home_loan_interest);
+    printf("| %-30s | %-10.2f |\n", "Rent Income Earned", rent_income);
+    printf("---------------------------------------------------\n");
+    printf("| %-30s | %-10.2f |\n", "Taxable Income", taxable_income);
+    printf("| %-30s | %-10.2f |\n", "Tax Payable", tax);
+    printf("---------------------------------------------------\n");
+}
+
+int verify() {
+    
+   
+
+    printf("Please Enter Your First Name: ");
+    scanf("%s", first_name);  
+
+    printf("Please Enter Your Last Name: ");
+    scanf("%s", last_name); 
+    
+    printf("Enter Your License Key:");
+    scanf("%s", u_license);  
+
+    i = strcmp(license, u_license);
+    if (i == 0) {
+        printf("Original Copy Verified\n");
+        strcat(first_name, last_name); 
+        printf("User Name: %s\n", first_name);
+    } else{
+        printf("Enter A Valid License\n");
+        i = strlen(u_license);
+        if (i != 5) {
+            printf("Length should be 5\n");
+            printf("Length is: %d\n", i);
+            exit(0);
+        } else {
+            strcpy(copied, u_license);
+            printf("Incorrect license: %s\n", copied);
+            exit(0);
+        }
+    }
+}
